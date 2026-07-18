@@ -1,0 +1,17 @@
+{
+  "name": "sakura-tracker",
+  "version": "1.0.0",
+  "description": "Sakura Habit Tracker — vanilla JS, three static files",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.4",
+    "fast-check": "^3.23.2",
+    "jsdom": "^26.1.0",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sakura Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <button data-target="dashboard">Dashboard</button>
+    <button data-target="checklist">Checklist</button>
+    <button data-target="statistics">Statistics</button>
+    <button data-target="japanese">Japanese</button>
+    <button data-target="running">Running</button>
+    <button data-target="investment">Investment</button>
+  </nav>
+
+  <!-- Main content -->
+  <main id="app">
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section--active" aria-labelledby="dashboard-heading">
+      <h2 id="dashboard-heading">Dashboard</h2>
+
+      <!-- Today's date: formatted as "Day, DD Month YYYY" -->
+      <p id="dashboard-date" aria-label="Today's date">—</p>
+
+      <div class="dashboard-stats">
+        <!-- Current streak (consecutive fully-completed days) -->
+        <div class="stat-card">
+          <span class="stat-label">Streak</span>
+          <span id="dashboard-streak" class="stat-value">0</span>
+          <span class="stat-unit">days</span>
+        </div>
+
+        <!-- Total individual habit checks across all stored days -->
+        <div class="stat-card">
+          <span class="stat-label">Total Completions</span>
+          <span id="dashboard-total" class="stat-value">0</span>
+        </div>
+
+        <!-- Today's progress as an integer percentage: floor((checked / 10) × 100) -->
+        <div class="stat-card">
+          <span class="stat-label">Today's Progress</span>
+          <span id="dashboard-progress-pct" class="stat-value">0</span>
+          <span class="stat-unit">%</span>
+        </div>
+      </div>
+
+      <!-- Progress bar: fill width reflects today's completion percentage -->
+      <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Today's habit completion progress">
+        <div class="progress-bar__fill" style="width: 0%"></div>
+      </div>
+      <!-- Fraction label: "n / 10" alongside percentage -->
+      <p class="progress-bar__meta">
+        <span id="dashboard-fraction">0 / 10</span>
+        <span>&nbsp;—&nbsp;</span>
+        <span id="dashboard-progress-pct-label">0%</span>
+      </p>
+    </section>
+
+    <!-- Checklist Section -->
+    <section id="checklist" aria-labelledby="checklist-heading">
+      <h2 id="checklist-heading">Daily Checklist</h2>
+
+      <!-- Habit list: <li> items with checkboxes are rendered by ChecklistModule in script.js -->
+      <ul id="habit-list"></ul>
+
+      <!-- Progress bar -->
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="checklist-progress-bar" style="width: 0%"></div>
+      </div>
+      <p class="progress-label" id="checklist-progress-label">0 / 10</p>
+      <span id="checklist-progress-percent">0%</span>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="statistics" aria-labelledby="statistics-heading">
+      <h2 id="statistics-heading">Statistics</h2>
+
+      <!-- Weekly completion chart: daily completion % for each of the last 7 calendar days -->
+      <div class="chart-container">
+        <h3>Weekly Overview</h3>
+        <canvas id="weekly-chart" aria-label="Weekly habit completion chart" role="img"></canvas>
+      </div>
+
+      <!-- Monthly completion chart: daily completion % for each day of the current calendar month -->
+      <div class="chart-container">
+        <h3>Monthly Overview</h3>
+        <canvas id="monthly-chart" aria-label="Monthly habit completion chart" role="img"></canvas>
+      </div>
+
+      <!-- Habit consistency chart: completion rate (0–100%) for each of the ten habits -->
+      <div class="chart-container">
+        <h3>Habit Consistency</h3>
+        <canvas id="habit-chart" aria-label="Habit consistency chart" role="img"></canvas>
+      </div>
+    </section>
+
+    <!-- Japanese Progress Section -->
+    <section id="japanese" aria-labelledby="japanese-heading">
+      <h2 id="japanese-heading">Japanese Progress</h2>
+
+      <div class="japanese-cards">
+
+        <!-- Hiragana card -->
+        <div class="japanese-card" id="hiragana-card">
+          <h3 class="japanese-card__title">Hiragana</h3>
+          <div class="japanese-card__input-row">
+            <input
+              type="number"
+              id="hiragana-input"
+              class="japanese-card__input"
+              min="0"
+              max="46"
+              value="0"
+              aria-label="Hiragana characters mastered"
+            />
+            <span class="japanese-card__total">/ <span class="total">46</span></span>
+          </div>
+          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Hiragana mastery progress">
+            <div class="progress-bar__fill" style="width: 0%"></div>
+          </div>
+          <p class="japanese-card__pct">0%</p>
+        </div>
+
+        <!-- Katakana card -->
+        <div class="japanese-card" id="katakana-card">
+          <h3 class="japanese-card__title">Katakana</h3>
+          <div class="japanese-card__input-row">
+            <input
+              type="number"
+              id="katakana-input"
+              class="japanese-card__input"
+              min="0"
+              max="46"
+              value="0"
+              aria-label="Katakana characters mastered"
+            />
+            <span class="japanese-card__total">/ <span class="total">46</span></span>
+          </div>
+          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Katakana mastery progress">
+            <div class="progress-bar__fill" style="width: 0%"></div>
+          </div>
+          <p class="japanese-card__pct">0%</p>
+        </div>
+
+        <!-- Kanji card -->
+        <div class="japanese-card" id="kanji-card">
+          <h3 class="japanese-card__title">Kanji</h3>
+          <div class="japanese-card__input-row">
+            <input
+              type="number"
+              id="kanji-input"
+              class="japanese-card__input"
+              min="0"
+              max="2136"
+              value="0"
+              aria-label="Kanji characters mastered"
+            />
+            <span class="japanese-card__total">/ <span class="total">2136</span></span>
+          </div>
+          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Kanji mastery progress">
+            <div class="progress-bar__fill" style="width: 0%"></div>
+          </div>
+          <p class="japanese-card__pct">0%</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Running Progress Section -->
+    <section id="running" aria-labelledby="running-heading">
+      <h2 id="running-heading">Running Progress</h2>
+
+      <!-- Session entry form (Req 7.1) -->
+      <form id="running-form" novalidate aria-label="Log a running session">
+        <div class="form-group">
+          <label for="running-distance">Distance (km)</label>
+          <input
+            type="number"
+            id="running-distance"
+            name="distance"
+            min="0.01"
+            step="0.01"
+            placeholder="e.g. 5.0"
+            aria-required="true"
+            aria-describedby="running-distance-error"
+          />
+          <!-- Inline validation error — shown when distance ≤ 0, empty, or non-numeric (Req 7.5) -->
+          <span class="field-error" id="running-distance-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="running-time">Time (minutes)</label>
+          <input
+            type="number"
+            id="running-time"
+            name="time"
+            min="0.01"
+            step="0.01"
+            placeholder="e.g. 30"
+            aria-required="true"
+            aria-describedby="running-time-error"
+          />
+          <!-- Inline validation error — shown when time ≤ 0, empty, or non-numeric (Req 7.5) -->
+          <span class="field-error" id="running-time-error" role="alert" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="running-date">Date</label>
+          <input
+            type="date"
+            id="running-date"
+            name="date"
+            aria-required="true"
+          />
+        </div>
+
+        <button type="submit" id="running-submit">Log Session</button>
+      </form>
+
+      <!-- Pace-improvement line chart (Req 7.3) — canvas used by Chart.js via RunningModule -->
+      <div class="chart-container">
+        <canvas id="running-chart" aria-label="Running pace over time chart" role="img"></canvas>
+      </div>
+
+      <!-- Empty-state placeholder — rendered when no sessions exist in LocalStorage (Req 7.6) -->
+      <p id="running-empty" class="empty-state">No sessions logged yet.</p>
+
+    </section>
+
+    <!-- Investment Progress Section -->
+    <section id="investment" aria-labelledby="investment-heading">
+      <h2 id="investment-heading">Investment Progress</h2>
+
+      <!-- Input fields for Current Investment, Monthly Target, and Goal (Req 8.1) -->
+      <div class="form-group">
+        <label for="investment-current">Current Investment</label>
+        <input
+          type="number"
+          id="investment-current"
+          name="investment-current"
+          min="0"
+          step="0.01"
+          placeholder="e.g. 5000"
+          aria-describedby="investment-current-error"
+        />
+        <!-- Inline validation error — shown when value is negative or non-numeric (Req 8.1) -->
+        <span class="field-error" id="investment-current-error" role="alert" aria-live="polite"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="investment-monthly-target">Monthly Target</label>
+        <input
+          type="number"
+          id="investment-monthly-target"
+          name="investment-monthly-target"
+          min="0"
+          step="0.01"
+          placeholder="e.g. 500"
+          aria-describedby="investment-monthly-target-error"
+        />
+        <!-- Inline validation error — shown when value is negative or non-numeric (Req 8.1) -->
+        <span class="field-error" id="investment-monthly-target-error" role="alert" aria-live="polite"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="investment-goal">Goal</label>
+        <input
+          type="number"
+          id="investment-goal"
+          name="investment-goal"
+          min="0"
+          step="0.01"
+          placeholder="e.g. 50000"
+          aria-describedby="investment-goal-error"
+        />
+        <!-- Inline validation error — shown when value is negative or non-numeric (Req 8.1) -->
+        <span class="field-error" id="investment-goal-error" role="alert" aria-live="polite"></span>
+      </div>
+
+      <!-- Progress bar: fill = floor((Current ÷ Goal) × 100)%, clamped 0–100% (Req 8.2) -->
+      <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Investment goal progress">
+        <div class="progress-bar-fill" id="investment-progress-fill" style="width: 0%"></div>
+      </div>
+      <!-- Percentage label for the progress bar (Req 8.2) -->
+      <span id="investment-progress-label">0%</span>
+
+      <!-- Monthly target percentage: floor((Current ÷ Monthly Target) × 100)%, capped 100% (Req 8.3) -->
+      <p class="investment-monthly">
+        Monthly Target Progress: <span id="investment-monthly-pct">0%</span>
+      </p>
+
+      <!-- "Goal Reached" indicator — visible when Current ≥ Goal and Goal > 0 (Req 8.6) -->
+      <div id="investment-goal-reached" class="goal-reached" style="display:none">🎉 Goal Reached!</div>
+
+    </section>
+
+  </main>
+
+  <script src="script.js" type="module"></script>
+</body>
+</html>
